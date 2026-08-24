@@ -1,5 +1,6 @@
 package com.Spring.FoodRescue.Controller;
 
+import com.Spring.FoodRescue.DTO.ConfirmedDonationRequest;
 import com.Spring.FoodRescue.DTO.DonationRequest;
 import com.Spring.FoodRescue.Model.Donation;
 import com.Spring.FoodRescue.Service.DonationService;
@@ -46,5 +47,17 @@ public class DonationController {
         return ResponseEntity.ok(
                 donationService.getDonationById(id)
         );
+    }
+
+    @PostMapping("/from-analysis")
+    public ResponseEntity<Donation> createFromAnalysis(
+            @RequestBody ConfirmedDonationRequest request
+    ) {
+
+        Donation donation = donationService.createDonationFromAnalysis(
+                request
+        );
+
+        return ResponseEntity.ok(donation);
     }
 }

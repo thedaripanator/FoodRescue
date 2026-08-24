@@ -1,0 +1,14 @@
+package com.Spring.FoodRescue.DTO;
+
+import lombok.Data;
+
+@Data
+public class DonationAnalysisRequest {
+    private String donorId;
+
+    private double latitude;
+
+    private double longitude;
+
+    private String pickupDeadline;
+}
