@@ -85,18 +85,12 @@ public class DonationService {
         );
 
         donation.setStatus(DonationStatus.AVAILABLE);
-
-        // Save first so MongoDB generates the donation ID
         Donation savedDonation =
                 donationRepository.save(donation);
-
-        // Automatically find the best NGO
         matchService.findBestNgo(
                 savedDonation.getId(),
                 null
         );
-
-        // Fetch the updated donation
         return donationRepository.findById(
                 savedDonation.getId()
         ).orElseThrow(() ->
@@ -104,5 +98,18 @@ public class DonationService {
                         "Donation could not be retrieved after matching"
                 )
         );
+    }
+    public List<Donation> getDonationsByDonor(
+            String donorId) {
+
+        return donationRepository.findByDonorId(
+                donorId
+        );
+    }
+    public List<Donation> getDonationsByNgo(
+            String ngoId) {
+
+        return donationRepository
+                .findByMatchedNgoId(ngoId);
     }
 }

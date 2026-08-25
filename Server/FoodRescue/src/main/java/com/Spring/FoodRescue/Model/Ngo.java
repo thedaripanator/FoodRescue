@@ -1,4 +1,5 @@
 package com.Spring.FoodRescue.Model;
+
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,6 +12,8 @@ public class Ngo {
 
     @Id
     private String id;
+
+    private String userId;
 
     private String organizationName;
 

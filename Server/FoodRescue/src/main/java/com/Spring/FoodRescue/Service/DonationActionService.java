@@ -2,91 +2,117 @@ package com.Spring.FoodRescue.Service;
 
 import com.Spring.FoodRescue.Model.Donation;
 import com.Spring.FoodRescue.Model.DonationStatus;
+import com.Spring.FoodRescue.Model.Ngo;
 import com.Spring.FoodRescue.Repository.DonationRepository;
+import com.Spring.FoodRescue.Repository.NgoRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DonationActionService {
 
     private final DonationRepository donationRepository;
+    private final NgoRepository ngoRepository;
     private final MatchService matchService;
 
     public DonationActionService(
             DonationRepository donationRepository,
+            NgoRepository ngoRepository,
             MatchService matchService) {
 
-        this.donationRepository = donationRepository;
-        this.matchService = matchService;
+        this.donationRepository =
+                donationRepository;
+
+        this.ngoRepository =
+                ngoRepository;
+
+        this.matchService =
+                matchService;
     }
 
-    /*
-     * NGO accepts the matched donation
-     */
-    public Donation acceptDonation(String donationId, String ngoId) {
 
-        Donation donation = getDonation(donationId);
+    public Donation acceptDonation(
+            String donationId,
+            String userId) {
 
-        // Make sure the donation is actually matched
-        if (donation.getStatus() != DonationStatus.MATCHED) {
+        Ngo ngo =
+                getNgoByUserId(userId);
+
+        Donation donation =
+                getDonation(donationId);
+
+
+        if (donation.getStatus()
+                != DonationStatus.MATCHED) {
+
             throw new RuntimeException(
                     "Donation cannot be accepted in current status: "
                             + donation.getStatus()
             );
         }
 
-        // Make sure this NGO was selected
-        if (!ngoId.equals(donation.getMatchedNgoId())) {
+
+        if (!ngo.getId().equals(
+                donation.getMatchedNgoId())) {
+
             throw new RuntimeException(
                     "This NGO is not assigned to this donation"
             );
         }
 
-        donation.setStatus(DonationStatus.ACCEPTED);
+        donation.setStatus(
+                DonationStatus.ACCEPTED
+        );
 
-        return donationRepository.save(donation);
+        return donationRepository.save(
+                donation
+        );
     }
 
-    /*
-     * NGO rejects the donation
-     */
+
     public Donation rejectDonation(
             String donationId,
-            String ngoId) {
+            String userId) {
 
-        Donation donation = getDonation(donationId);
+        Ngo ngo =
+                getNgoByUserId(userId);
 
-        if (donation.getStatus() != DonationStatus.MATCHED) {
+        Donation donation =
+                getDonation(donationId);
+
+        if (donation.getStatus()
+                != DonationStatus.MATCHED) {
+
             throw new RuntimeException(
                     "Donation cannot be rejected in current status: "
                             + donation.getStatus()
             );
         }
 
-        if (!ngoId.equals(donation.getMatchedNgoId())) {
+        if (!ngo.getId().equals(
+                donation.getMatchedNgoId())) {
+
             throw new RuntimeException(
                     "This NGO is not assigned to this donation"
             );
         }
+        String rejectedNgoId =
+                ngo.getId();
 
-        // Remember the NGO that rejected the donation
-        String rejectedNgoId = donation.getMatchedNgoId();
-
-        // Remove the current NGO
         donation.setMatchedNgoId(null);
 
-        // Put donation back into matching pool
-        donation.setStatus(DonationStatus.AVAILABLE);
+
+        donation.setStatus(
+                DonationStatus.AVAILABLE
+        );
 
         Donation savedDonation =
-                donationRepository.save(donation);
-
-        // Find another NGO, excluding the rejected NGO
+                donationRepository.save(
+                        donation
+                );
         matchService.findBestNgo(
                 savedDonation.getId(),
                 rejectedNgoId
         );
-
-        // Return the updated donation
         return donationRepository.findById(
                 savedDonation.getId()
         ).orElseThrow(() ->
@@ -95,45 +121,91 @@ public class DonationActionService {
                 )
         );
     }
-    /*
-     * Food has been picked up
-     */
-    public Donation markPickedUp(String donationId) {
 
-        Donation donation = getDonation(donationId);
+    public Donation markPickedUp(
+            String donationId,
+            String userId) {
 
-        if (donation.getStatus() != DonationStatus.ACCEPTED) {
+        Ngo ngo =
+                getNgoByUserId(userId);
+
+        Donation donation =
+                getDonation(donationId);
+
+        if (!ngo.getId().equals(
+                donation.getMatchedNgoId())) {
+
+            throw new RuntimeException(
+                    "This NGO is not assigned to this donation"
+            );
+        }
+        if (donation.getStatus()
+                != DonationStatus.ACCEPTED) {
+
             throw new RuntimeException(
                     "Donation must be ACCEPTED before pickup"
             );
         }
 
-        donation.setStatus(DonationStatus.PICKED_UP);
+        donation.setStatus(
+                DonationStatus.PICKED_UP
+        );
 
-        return donationRepository.save(donation);
+        return donationRepository.save(
+                donation
+        );
     }
+    public Donation markDistributed(
+            String donationId,
+            String userId) {
 
-    /*
-     * Food has been distributed
-     */
-    public Donation markDistributed(String donationId) {
+        Ngo ngo =
+                getNgoByUserId(userId);
 
-        Donation donation = getDonation(donationId);
+        Donation donation =
+                getDonation(donationId);
 
-        if (donation.getStatus() != DonationStatus.PICKED_UP) {
+        if (!ngo.getId().equals(
+                donation.getMatchedNgoId())) {
+
+            throw new RuntimeException(
+                    "This NGO is not assigned to this donation"
+            );
+        }
+        if (donation.getStatus()
+                != DonationStatus.PICKED_UP) {
+
             throw new RuntimeException(
                     "Donation must be PICKED_UP before distribution"
             );
         }
 
-        donation.setStatus(DonationStatus.DISTRIBUTED);
+        donation.setStatus(
+                DonationStatus.DISTRIBUTED
+        );
 
-        return donationRepository.save(donation);
+        return donationRepository.save(
+                donation
+        );
     }
 
-    private Donation getDonation(String donationId) {
+    private Ngo getNgoByUserId(
+            String userId) {
 
-        return donationRepository.findById(donationId)
+        return ngoRepository
+                .findByUserId(userId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "NGO profile not found for user: "
+                                        + userId
+                        )
+                );
+    }
+    private Donation getDonation(
+            String donationId) {
+
+        return donationRepository
+                .findById(donationId)
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Donation not found with id: "
