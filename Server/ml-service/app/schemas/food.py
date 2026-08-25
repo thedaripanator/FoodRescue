@@ -5,11 +5,14 @@ from pydantic import BaseModel, Field
 class FoodAnalysis(BaseModel):
 
     foodType: Literal[
-        "VEGETARIAN",
-        "NON_VEGETARIAN",
-        "VEGAN",
-        "PACKAGED",
-        "UNKNOWN"
+        "Cooked Meals",
+        "Raw Vegetables",
+        "Fruits",
+        "Bakery Items",
+        "Packaged Food",
+        "Dairy",
+        "Beverages",
+        "Other"
     ] = Field(
         description="Main food category visible in the image."
     )

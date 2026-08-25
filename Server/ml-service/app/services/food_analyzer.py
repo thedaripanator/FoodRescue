@@ -41,12 +41,15 @@ Analyze the provided food image.
 
 Determine:
 
-1. Main food category:
-   - VEGETARIAN
-   - NON_VEGETARIAN
-   - VEGAN
-   - PACKAGED
-   - UNKNOWN
+1. Main food category (you MUST choose exactly one from this list):
+   - Cooked Meals
+   - Raw Vegetables
+   - Fruits
+   - Bakery Items
+   - Packaged Food
+   - Dairy
+   - Beverages
+   - Other
 
 2. List the food items clearly visible.
 

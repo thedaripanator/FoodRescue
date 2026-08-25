@@ -52,21 +52,28 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // DONOR only
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/donations"
-                        ).hasRole("DONOR")
 
                         .requestMatchers(
                                 HttpMethod.POST,
+                                "/api/donations",
                                 "/api/donations/from-analysis"
                         ).hasRole("DONOR")
 
-                        // NGO only
+
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/ngos"
+                        ).hasAnyRole("NGO", "DONOR")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/ngos/me",
+                                "/api/ngos/me/donations"
+                        ).hasRole("NGO")
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/ngos/me/availability"
                         ).hasRole("NGO")
 
                         .requestMatchers(
@@ -77,16 +84,28 @@ public class SecurityConfig {
                                 "/api/donations/*/distributed"
                         ).hasRole("NGO")
 
-                        // ADMIN only
+
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/admin/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/ngos",
+                                "/api/ngos/*"
+                        ).hasRole("ADMIN")
+
                         .requestMatchers(
                                 HttpMethod.PUT,
                                 "/api/ngos/*/verify"
                         ).hasRole("ADMIN")
 
-                        // Everything else requires authentication
+
+
                         .anyRequest().authenticated()
                 )
-
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class

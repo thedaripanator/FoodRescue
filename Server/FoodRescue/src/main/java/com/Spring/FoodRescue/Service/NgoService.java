@@ -4,6 +4,7 @@ import com.Spring.FoodRescue.DTO.NgoRequest;
 import com.Spring.FoodRescue.Model.Ngo;
 import com.Spring.FoodRescue.Model.User;
 import com.Spring.FoodRescue.Repository.NgoRepository;
+import com.Spring.FoodRescue.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +13,11 @@ import java.util.List;
 public class NgoService {
 
     private final NgoRepository ngoRepository;
+    private final UserRepository userRepository;
 
-    public NgoService(NgoRepository ngoRepository) {
+    public NgoService(NgoRepository ngoRepository, UserRepository userRepository) {
         this.ngoRepository = ngoRepository;
+        this.userRepository = userRepository;
     }
     public Ngo registerNgo(
             NgoRequest request,
@@ -63,6 +66,12 @@ public class NgoService {
         ngo.setVerified(false);
 
         ngo.setAvailable(false);
+        
+        // Upgrade user role to NGO
+        if ("DONOR".equals(user.getRole())) {
+            user.setRole("NGO");
+            userRepository.save(user);
+        }
 
         return ngoRepository.save(ngo);
     }

@@ -25,7 +25,9 @@ public class DonationController {
         this.donationService = donationService;
     }
 
-
+    /*
+     * Create normal donation
+     */
     @PostMapping
     public ResponseEntity<Donation> createDonation(
             @Valid @RequestBody DonationRequest request,
@@ -34,30 +36,31 @@ public class DonationController {
         User user =
                 (User) authentication.getPrincipal();
 
-
-        request.setDonorId(user.getId());
-
         Donation donation =
-                donationService.createDonation(request);
+                donationService.createDonation(
+                        request,
+                        user.getId()
+                );
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(donation);
     }
-    @GetMapping
-    public ResponseEntity<List<Donation>> getMyDonations(
-            Authentication authentication) {
 
-        User user =
-                (User) authentication.getPrincipal();
+    /*
+     * Get all donations
+     */
+    @GetMapping
+    public ResponseEntity<List<Donation>> getAllDonations() {
 
         return ResponseEntity.ok(
-                donationService.getDonationsByDonor(
-                        user.getId()
-                )
+                donationService.getAllDonations()
         );
     }
 
+    /*
+     * Get donation by ID
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Donation> getDonationById(
             @PathVariable String id) {
@@ -67,21 +70,23 @@ public class DonationController {
         );
     }
 
+    /*
+     * Create donation from food analysis
+     */
     @PostMapping("/from-analysis")
     public ResponseEntity<Donation> createFromAnalysis(
-            @RequestBody ConfirmedDonationRequest request,
+            @Valid @RequestBody ConfirmedDonationRequest request,
             Authentication authentication) {
 
         User user =
                 (User) authentication.getPrincipal();
-        request.setDonorId(user.getId());
 
         Donation donation =
                 donationService.createDonationFromAnalysis(
-                        request
+                        request,
+                        user.getId()
                 );
 
         return ResponseEntity.ok(donation);
     }
-
 }

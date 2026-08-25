@@ -9,9 +9,6 @@ import java.time.LocalDateTime;
 public class DonationRequest {
 
     @NotBlank
-    private String donorId;
-
-    @NotBlank
     private String foodType;
 
     @Min(0)
@@ -30,14 +27,6 @@ public class DonationRequest {
     private LocalDateTime pickupDeadline;
 
     private String urgency;
-
-    public String getDonorId() {
-        return donorId;
-    }
-
-    public void setDonorId(String donorId) {
-        this.donorId = donorId;
-    }
 
     public String getFoodType() {
         return foodType;
