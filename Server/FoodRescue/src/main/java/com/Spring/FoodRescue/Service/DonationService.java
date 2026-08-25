@@ -92,7 +92,8 @@ public class DonationService {
 
         // Automatically find the best NGO
         matchService.findBestNgo(
-                savedDonation.getId()
+                savedDonation.getId(),
+                null
         );
 
         // Fetch the updated donation

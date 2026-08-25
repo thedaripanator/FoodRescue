@@ -20,7 +20,7 @@ public class MatchingController {
             @PathVariable String donationId) {
 
         MatchResponse response =
-                matchingService.findBestNgo(donationId);
+                matchingService.findBestNgo(donationId,null);
 
         return ResponseEntity.ok(response);
     }
